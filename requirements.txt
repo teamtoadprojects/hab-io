@@ -1,0 +1,3 @@
+pyyaml
+structlog
+simple-plugin-loader

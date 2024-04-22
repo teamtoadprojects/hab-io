@@ -1,0 +1,4 @@
+input_plugins: ["demo_input"]
+output_plugins: ["demo_output"]
+core:
+  buffer_size: 1000
