@@ -1,3 +1,4 @@
 pyyaml
 structlog
 simple-plugin-loader
+aiohttp

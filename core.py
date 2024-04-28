@@ -1,6 +1,6 @@
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, UTC
 from time import time
 
 from simple_plugin_loader import Loader
@@ -10,12 +10,9 @@ import yaml
 
 logger = structlog.get_logger()
 
-loop = asyncio.get_event_loop()
-
 
 @dataclass
 class Payload:
-    recieved_at: datetime = datetime.now(datetime.UTC)
     callsign: str
     payload_id: int
     time: time
@@ -29,26 +26,32 @@ class Payload:
     speed: float
     ascent_rate: float
     other_fields: dict
+    recieved_at: datetime = datetime.now(UTC)
 
 
 class PluginBase:
-    def __init__(self, config, core):
+    def __init__(self, config, core, loop):
         self.config = config
         self.core = core
         self.logger = logger.bind(plugin=self.__class__.__name__)
+        self.loop = loop
 
-    async def init(self):
-        self.logger.info("Initializing plugin with config", config=self.config)
+    async def start(self):
+        self.logger.info("Starting plugin with config", config=self.config)
+
+    async def output(self, payload: Payload):
+        self.logger.info("Outputting payload", payload=payload)
 
     def run(self):
         self.logger.info("Running plugin with config", config=self.config)
 
 
 class Core:
-    def __init__(self, config):
+    def __init__(self, config, loop):
         self.config = config
         self.input_plugins = []
         self.output_plugins = []
+        self.loop = loop
 
     def load_plugins(self):
         loader = Loader()
@@ -57,18 +60,22 @@ class Core:
         )
         for k, v in input_plugins.items():
             logger.info("Loading input plugin", plugin=k)
-            self.input_plugins.append(v(self.config.get(k), self))
+            self.input_plugins.append(v(self.config.get(k), self, self.loop))
         output_plugins = loader.load_plugins(
             "output", PluginBase, self.config["output_plugins"]
         )
         for k, v in output_plugins.items():
             logger.info("Loading output plugin", plugin=k)
-            self.output_plugins.append(v(self.config.get(k), self))
+            self.output_plugins.append(v(self.config.get(k), self, self.loop))
 
     async def init_plugins(self):
         async with asyncio.TaskGroup() as tg:
             for plugin in self.input_plugins + self.output_plugins:
-                tg.create_task(plugin.init())
+                tg.create_task(plugin.start())
+
+    async def receive_payload(self, payload: Payload):
+        for plugin in self.output_plugins:
+            await plugin.output(payload)
 
     def run(self):
 
@@ -76,11 +83,13 @@ class Core:
         asyncio.run(self.init_plugins())
 
         logger.info("Running core with config", config=self.config)
-        loop.run_forever()
+        self.loop.run_forever()
 
 
 if __name__ == "__main__":
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     with open("config.yml", "r") as file:
         config = yaml.safe_load(file)
-    core = Core(config)
+    core = Core(config, loop)
     core.run()

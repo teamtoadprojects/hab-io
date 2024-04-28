@@ -7,6 +7,7 @@ name = "pypi"
 pyyaml = "*"
 structlog = "*"
 simple-plugin-loader = "*"
+aiohttp = "*"
 
 [dev-packages]
 
