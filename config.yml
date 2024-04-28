@@ -1,6 +1,8 @@
 input_plugins: ["demo_input", "json_receiver"]
-output_plugins: ["demo_output"]
+output_plugins: ["demo_output", "simple_html_viewer"]
 core:
   buffer_size: 1000
 json_receiver:
   port: 9999
+simple_html_viewer:
+  port: 9998

@@ -74,6 +74,7 @@ class Core:
                 tg.create_task(plugin.start())
 
     async def receive_payload(self, payload: Payload):
+        logger.info("Received payload", payload=payload)
         for plugin in self.output_plugins:
             await plugin.output(payload)
 
@@ -88,6 +89,7 @@ class Core:
 
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
+    loop.set_debug(True)
     asyncio.set_event_loop(loop)
     with open("config.yml", "r") as file:
         config = yaml.safe_load(file)
