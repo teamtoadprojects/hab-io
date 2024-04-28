@@ -8,6 +8,7 @@ pyyaml = "*"
 structlog = "*"
 simple-plugin-loader = "*"
 aiohttp = "*"
+pyserial = "*"
 
 [dev-packages]
 
