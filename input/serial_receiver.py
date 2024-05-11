@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 
 import serial
 
@@ -24,17 +25,17 @@ class serial_receiver(PluginBase):
                 continue
             self.logger.info("Received line from serial port", line=line)
             payload = Payload(
-                callsign=line.split(",")[0],
+                callsign=line.split(",")[0].removeprefix("$$"),
                 payload_id=line.split(",")[1],
-                time=line.split(",")[2],
-                latitude=line.split(",")[3],
-                longitude=line.split(",")[4],
-                altitude=line.split(",")[5],
-                temperature=line.split(",")[6],
-                sats=line.split(",")[7],
-                battery=line.split(",")[8],
-                pressure=line.split(",")[9],
-                speed=line.split(",")[10],
+                time=datetime.strptime(line.split(",")[2], "%H:%M:%S"),
+                latitude=float(line.split(",")[3]),
+                longitude=float(line.split(",")[4]),
+                altitude=float(line.split(",")[5]),
+                temperature=float(line.split(",")[6]),
+                sats=int(line.split(",")[7]),
+                battery=float(line.split(",")[8]),
+                pressure=float(line.split(",")[9]),
+                speed=float(line.split(",")[10]) if line.split(",")[10] else 0.0,
                 ascent_rate=None,
                 other_fields={
                     "checksum": line.split(",")[11],

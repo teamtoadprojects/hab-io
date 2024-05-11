@@ -1,7 +1,6 @@
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime, UTC
-from time import time
+from datetime import datetime, UTC, time
 
 from simple_plugin_loader import Loader
 from simple_plugin_loader.sample_plugin import SamplePlugin
@@ -46,6 +45,10 @@ class PluginBase:
         self.logger.info("Running plugin with config", config=self.config)
 
 
+class ForgivingTaskGroup(asyncio.TaskGroup):
+    _abort = lambda self: None
+
+
 class Core:
     def __init__(self, config, loop):
         self.config = config
@@ -75,8 +78,13 @@ class Core:
 
     async def receive_payload(self, payload: Payload):
         logger.info("Received payload", payload=payload)
-        for plugin in self.output_plugins:
-            await plugin.output(payload)
+        try:
+            async with ForgivingTaskGroup() as tg:
+                for plugin in self.output_plugins:
+                    tg.create_task(plugin.output(payload))
+        except ExceptionGroup as eg:
+            for err in eg.exceptions:
+                logger.error("Error processing payload", error=str(err))
 
     def run(self):
 

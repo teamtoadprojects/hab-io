@@ -1,5 +1,6 @@
 
 import asyncio
+from datetime import datetime
 import json
 import http.server
 
@@ -23,15 +24,15 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         payload = Payload(
             callsign=json_message.get("callsign"),
             payload_id=json_message.get("payload_id"),
-            time=json_message.get("time"),
-            latitude=json_message.get("latitude"),
-            longitude=json_message.get("longitude"),
-            altitude=json_message.get("altitude"),
+            time=datetime.strptime(json_message.get("time", "00:00:00"), "%H:%M:%S"),  # "time":"12:34:56
+            latitude=float(json_message.get("latitude", 0.0)),
+            longitude=float(json_message.get("longitude", 0.0)),
+            altitude=float(json_message.get("altitude", 0.0)),
             temperature=json_message.get("temperature"),
             sats=json_message.get("sats"),
             battery=json_message.get("battery"),
             pressure=json_message.get("pressure"),
-            speed=json_message.get("speed"),
+            speed=float(json_message.get("speed", 0.0)),
             ascent_rate=json_message.get("ascent_rate"),
             other_fields=json_message.get("other_fields"),
         )
