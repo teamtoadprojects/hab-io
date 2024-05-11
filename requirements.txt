@@ -1,5 +1,5 @@
 pyyaml
 structlog
 simple-plugin-loader
-aiohttp
+asyncudp
 pyserial

@@ -1,5 +1,5 @@
 input_plugins: ["demo_input", "json_receiver", "serial_receiver"]
-output_plugins: ["demo_output", "simple_html_viewer"]
+output_plugins: ["demo_output", "simple_html_viewer", "ozijson"]
 core:
   buffer_size: 1000
 json_receiver:
@@ -9,3 +9,6 @@ simple_html_viewer:
 serial_receiver:
   port: /dev/ttyUSB0
   baudrate: 115200
+ozijson:
+  host: 127.0.0.1
+  port: 55672

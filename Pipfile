@@ -9,6 +9,7 @@ structlog = "*"
 simple-plugin-loader = "*"
 aiohttp = "*"
 pyserial = "*"
+asyncudp = "*"
 
 [dev-packages]
 

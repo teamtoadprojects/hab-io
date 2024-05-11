@@ -7,13 +7,15 @@ from core import PluginBase, Payload
 
 class serial_receiver(PluginBase):
 
-    def __init__(self, config, core, loop):
-        super().__init__(config, core, loop)
-        self.serial_port = serial.Serial(config["port"], config["baudrate"])
-
     async def start(self):
         await super().start()
-        self.loop.run_in_executor(None, self.read_serial)
+        try:
+            self.serial_port = serial.Serial(
+                self.config["port"], self.config["baudrate"]
+            )
+            self.loop.run_in_executor(None, self.read_serial)
+        except Exception as e:
+            self.logger.error("Failed to open serial port", error=str(e))
 
     def read_serial(self):
         while True:
@@ -36,7 +38,7 @@ class serial_receiver(PluginBase):
                 ascent_rate=None,
                 other_fields={
                     "checksum": line.split(",")[11],
-                }
+                },
             )
             asyncio.run(self.core.receive_payload(payload))
 
