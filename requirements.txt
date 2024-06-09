@@ -3,3 +3,4 @@ structlog
 simple-plugin-loader
 asyncudp
 pyserial
+sondehub
