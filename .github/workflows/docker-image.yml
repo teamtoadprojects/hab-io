@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: [self-hosted, X64]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-config-inline: |
+            [registry."10.10.105.2:5000"]
+            http = true
+            insecure = true
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: 10.10.105.2:5000/lora-io:latest
+          cache-from: type=registry,ref=10.10.105.2:5000/lora-io:buildcache
+          cache-to: type=registry,ref=10.10.105.2:5000/lora-io    :buildcache,mode=max
