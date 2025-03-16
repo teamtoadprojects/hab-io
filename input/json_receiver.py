@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 import http.server
 
-from core import PluginBase, Payload
+from core import PluginBase, Payload, PayloadType
 
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
@@ -22,6 +22,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         json_message = json.loads(post_data)
         self.logger.info("Received JSON message", json_message=json_message)
         payload = Payload(
+            type=PayloadType.TELEMETRY,
             callsign=json_message.get("callsign"),
             payload_id=json_message.get("payload_id"),
             time=datetime.strptime(json_message.get("time", "00:00:00"), "%H:%M:%S"),  # "time":"12:34:56

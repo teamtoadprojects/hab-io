@@ -3,7 +3,7 @@ from datetime import datetime
 
 import serial
 
-from core import PluginBase, Payload
+from core import PluginBase, Payload, PayloadType
 
 
 class serial_receiver(PluginBase):
@@ -25,6 +25,7 @@ class serial_receiver(PluginBase):
                 continue
             self.logger.info("Received line from serial port", line=line)
             payload = Payload(
+                type=PayloadType.TELEMETRY,
                 callsign=line.split(",")[0].removeprefix("$$"),
                 payload_id=line.split(",")[1],
                 time=datetime.strptime(line.split(",")[2], "%H:%M:%S"),

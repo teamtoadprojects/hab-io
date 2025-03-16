@@ -1,7 +1,9 @@
 import asyncio
-from dataclasses import dataclass
+from enum import Enum
+from dataclasses import dataclass, field
 from datetime import datetime, UTC, time
 import os
+from typing import Optional
 
 from simple_plugin_loader import Loader
 from simple_plugin_loader.sample_plugin import SamplePlugin
@@ -10,22 +12,26 @@ import yaml
 
 logger = structlog.get_logger()
 
+class PayloadType(Enum):
+    TELEMETRY = "telemetry"
+    SSDV = "ssdv"
 
 @dataclass
 class Payload:
-    callsign: str
-    payload_id: int
-    time: time
-    latitude: float
-    longitude: float
-    altitude: float
-    temperature: float
-    sats: int
-    battery: float
-    pressure: float
-    speed: float
-    ascent_rate: float
-    other_fields: dict
+    type: PayloadType
+    callsign: Optional[str] = ""
+    payload_id: Optional[int] = -1
+    time: Optional[time] = datetime.now(UTC)
+    latitude: Optional[float] = 0.0
+    longitude: Optional[float] = 0.0
+    altitude: Optional[float] = 0.0
+    temperature: Optional[float] = 0.0
+    sats: Optional[int] = 0
+    battery: Optional[float] = 0.0
+    pressure: Optional[float] = 0.0
+    speed: Optional[float] = 0.0
+    ascent_rate: Optional[float] = 0.0
+    other_fields: Optional[dict] = field(default_factory=dict)
     recieved_at: datetime = datetime.now(UTC)
 
 
@@ -35,6 +41,7 @@ class PluginBase:
         self.core = core
         self.logger = logger.bind(plugin=self.__class__.__name__)
         self.loop = loop
+        self.payload_types = [PayloadType.TELEMETRY]
 
     async def start(self):
         self.logger.info("Starting plugin with config", config=self.config)
@@ -65,7 +72,7 @@ class Core:
         for k, v in input_plugins.items():
             logger.info("Loading input plugin", plugin=k)
             self.input_plugins.append(v(self.config.get(k), self, self.loop))
-        output_plugins = loader.load_plugins(
+        output_plugins = loader.load_plugins(   
             "output", PluginBase, self.config["output_plugins"]
         )
         for k, v in output_plugins.items():
@@ -82,7 +89,8 @@ class Core:
         try:
             async with ForgivingTaskGroup() as tg:
                 for plugin in self.output_plugins:
-                    tg.create_task(plugin.output(payload))
+                    if payload.type in plugin.payload_types:
+                        tg.create_task(plugin.output(payload))
         except ExceptionGroup as eg:
             for err in eg.exceptions:
                 logger.error("Error processing payload", error=str(err))
@@ -100,7 +108,7 @@ if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     loop.set_debug(True)
     asyncio.set_event_loop(loop)
-    with open(os.environ.get("CONFIG", "config.yml  "), "r") as file:
+    with open(os.environ.get("CONFIG", "./config.yml"), "r") as file:
         config = yaml.safe_load(file)
     core = Core(config, loop)
     core.run()

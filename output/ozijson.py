@@ -38,6 +38,7 @@ class ozijson(PluginBase):
 
     async def output(self, payload):
         self.logger.info("Outputting payload", payload=payload)
+
         ozi_payload = OziPayload(payload)
         udp_packet = ozi_payload.to_json().encode()
         self.logger.info("Sending packet", packet=udp_packet)
