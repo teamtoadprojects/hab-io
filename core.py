@@ -52,6 +52,9 @@ class PluginBase:
     def run(self):
         self.logger.info("Running plugin with config", config=self.config)
 
+    def __repr__(self):
+        return self.__class__.__name__
+
 
 class ForgivingTaskGroup(asyncio.TaskGroup):
     _abort = lambda self: None
@@ -72,7 +75,7 @@ class Core:
         for k, v in input_plugins.items():
             logger.info("Loading input plugin", plugin=k)
             self.input_plugins.append(v(self.config.get(k), self, self.loop))
-        output_plugins = loader.load_plugins(   
+        output_plugins = loader.load_plugins(
             "output", PluginBase, self.config["output_plugins"]
         )
         for k, v in output_plugins.items():
@@ -86,14 +89,14 @@ class Core:
 
     async def receive_payload(self, payload: Payload):
         logger.info("Received payload", payload=payload)
-        try:
-            async with ForgivingTaskGroup() as tg:
-                for plugin in self.output_plugins:
+        async with ForgivingTaskGroup() as tg:
+            for plugin in self.output_plugins:
+                try:
                     if payload.type in plugin.payload_types:
                         tg.create_task(plugin.output(payload))
-        except ExceptionGroup as eg:
-            for err in eg.exceptions:
-                logger.error("Error processing payload", error=str(err))
+                except ExceptionGroup as eg:
+                    for err in eg.exceptions:
+                        logger.error("Error processing payload", error=str(err), plugin=plugin)
 
     def run(self):
 
