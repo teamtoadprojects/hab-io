@@ -14,8 +14,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        env:
-          DOCKER_HOST: tcp://docker-in-docker:2375
         with:
           buildkitd-config-inline: |
             [registry."10.10.105.2:5000"]
