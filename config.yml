@@ -1,5 +1,5 @@
-input_plugins: ["demo_input", "json_receiver", "serial_receiver", "ssdv_serial_receiver"]
-output_plugins: ["demo_output", "simple_html_viewer", "ozijson", "ssdv_to_disk"]
+input_plugins: ["demo_input", "json_receiver"]
+output_plugins: ["demo_output", "simple_html_viewer"]
 core:
   buffer_size: 1000
   callsign: "M7FUS"
@@ -20,3 +20,5 @@ sondehub:
   developer_mode: true
 ssdv_to_disk:
   directory: /tmp/ssdv
+demo_input:
+  interval: 1
