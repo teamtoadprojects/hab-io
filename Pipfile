@@ -11,6 +11,7 @@ aiohttp = "*"
 pyserial = "*"
 asyncudp = "*"
 sondehub = "*"
+pyserial-asyncio = "*"
 
 [dev-packages]
 

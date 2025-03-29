@@ -97,6 +97,7 @@ class Core:
                 except ExceptionGroup as eg:
                     for err in eg.exceptions:
                         logger.error("Error processing payload", error=str(err), plugin=plugin)
+        logger.info("All tasks completed for payload", payload=payload)
 
     def run(self):
 

@@ -1,5 +1,5 @@
 input_plugins: ["demo_input", "json_receiver"]
-output_plugins: ["demo_output", "simple_html_viewer"]
+output_plugins: ["demo_output", "simple_html_viewer", "pico_display_output"]
 core:
   buffer_size: 1000
   callsign: "M7FUS"
@@ -21,4 +21,7 @@ sondehub:
 ssdv_to_disk:
   directory: /tmp/ssdv
 demo_input:
-  interval: 1
+  interval: 10
+pico_display_output:
+  port: /dev/ttyACM1
+  baudrate: 115200
