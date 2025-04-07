@@ -21,7 +21,7 @@ sondehub:
 ssdv_to_disk:
   directory: /tmp/ssdv
 demo_input:
-  interval: 10
+  interval: 10                      # seconds
 pico_display_output:
   port: /dev/ttyACM1
   baudrate: 115200

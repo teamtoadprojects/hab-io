@@ -19,6 +19,7 @@ class PayloadType(Enum):
 @dataclass
 class Payload:
     type: PayloadType
+    frequency: Optional[float] = 0.0
     callsign: Optional[str] = ""
     payload_id: Optional[int] = -1
     time: Optional[time] = datetime.now(UTC)

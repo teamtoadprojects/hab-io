@@ -67,7 +67,7 @@ class pico_display_output(PluginBase):
                     self.sending = False
         except Exception as e:
             self.logger.error("Failed to send data to Pico Display", error=str(e))
-            self.sending = False
+            self.sending = False        
 
     async def output(self, payload):
         self.logger.info("Outputting payload", payload=payload)
