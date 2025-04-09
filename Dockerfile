@@ -4,6 +4,9 @@ FROM debian:bullseye-slim AS ssdv
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
+    ca-certificates \
+    libssl-dev \
+    libcurl4-openssl-dev \
     git \
     curl && \
     rm -rf /var/lib/apt/lists/*
