@@ -24,10 +24,10 @@ class ssdv_to_disk(PluginBase):
 
         result = subprocess.run(
             [
-                "/ssdv/ssdv",
+                "/usr/local/bin/ssdv    ",
                 "-d",
                 f"{directory / filename}",
-                "{directory / root_         name}.jpg",
+                "{directory / root_                                 name}.jpg",
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

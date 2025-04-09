@@ -25,7 +25,7 @@ WORKDIR /app
 
 COPY . /app/
 
-COPY --from=ssdv /ssdv/ssdv /usr/local/bin/ssdv
+COPY --from=ssdv /ssdv/ssdv     
 
 ENV PATH=$PATH:/root/.local/bin
 ENV PIPENV_VENV_IN_PROJECT=1
