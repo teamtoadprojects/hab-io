@@ -28,3 +28,4 @@ class ssdv_to_disk(PluginBase):
         )
 
         self.logger.info("Wrote SSDV packet to disk", filename=filename)
+    
