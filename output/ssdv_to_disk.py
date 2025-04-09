@@ -22,10 +22,24 @@ class ssdv_to_disk(PluginBase):
             output_file.write(data)
             output_file.flush()
 
-        subprocess.call(
+        result = subprocess.run(
             f"/ssdv/ssdv -d {directory / filename} {directory / root_name}.jpg",
-            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
         )
-
         self.logger.info("Wrote SSDV packet to disk", filename=filename)
-    
+
+        self.logger.info(
+            "SSDV conversion result",
+            stdout=result.stdout,
+            stderr=result.stderr,
+        )
+        # Check if the conversion was successful
+        if result.returncode != 0:
+            self.logger.error(
+                "SSDV conversion failed",
+                error=result.stderr,
+                filename=filename,
+            )           
+
