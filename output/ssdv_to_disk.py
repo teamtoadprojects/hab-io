@@ -17,13 +17,18 @@ class ssdv_to_disk(PluginBase):
         filename = f"{root_name}.ssdv"
         directory = Path(self.config["directory"])
         full_output_path = directory / filename
-        with open(full_output_path, 'ab') as output_file:
+        with open(full_output_path, "ab") as output_file:
             data = bytes.fromhex(payload.other_fields["ssdv"])
             output_file.write(data)
             output_file.flush()
 
         result = subprocess.run(
-            f"/ssdv/ssdv -d {directory / filename} {directory / root_name}.jpg",
+            [
+                "/ssdv/ssdv",
+                "-d",
+                f"{directory / filename}",
+                "{directory / root_         name}.jpg",
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -41,5 +46,4 @@ class ssdv_to_disk(PluginBase):
                 "SSDV conversion failed",
                 error=result.stderr,
                 filename=filename,
-            )           
-
+            )
