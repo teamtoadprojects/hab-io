@@ -86,7 +86,11 @@ class Core:
     async def init_plugins(self):
         async with asyncio.TaskGroup() as tg:
             for plugin in self.input_plugins + self.output_plugins:
-                tg.create_task(plugin.start())
+                try:
+                    tg.create_task(plugin.start())
+                except Exception as e:
+                    logger.error("Failed to start plugin", plugin=plugin, error=str(e))
+        logger.info("All plugins initialized")
 
     async def receive_payload(self, payload: Payload):
         logger.info("Received payload", payload=payload)

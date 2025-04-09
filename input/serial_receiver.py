@@ -28,7 +28,7 @@ class serial_receiver(PluginBase):
                 type=PayloadType.TELEMETRY,
                 frequency=line.split(",")[0].removeprefix("$$"),
                 callsign=line.split(",")[1].removeprefix("$$"),
-                payload_id=line.split(",")[2],  # Assuming this is an integer   
+                payload_id=line.split(",")[2],  # Assuming this is an integer
                 time=datetime.strptime(line.split(",")[3], "%H:%M:%S"),
                 latitude=float(line.split(",")[4]) if line.split(",")[4] else 0.0,
                 longitude=float(line.split(",")[5]) if line.split(",")[5] else 0.0,
