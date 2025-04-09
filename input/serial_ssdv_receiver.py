@@ -121,6 +121,7 @@ class ssdv_serial_receiver(PluginBase):
 
     async def start(self):
         await super().start()
+        self.logger.info("Starting SSDV serial receiver plugin with config", config=self.config)
         try:
             self.serial_port = serial.Serial(
                 self.config["port"], self.config["baudrate"]
