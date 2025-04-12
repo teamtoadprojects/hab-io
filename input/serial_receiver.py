@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, UTC
 
 import serial
 
@@ -42,6 +42,7 @@ class serial_receiver(PluginBase):
                 other_fields={
                     "checksum": line.split(",")[11],
                 },
+                recieved_at=datetime.now(UTC),
             )
             asyncio.run(self.core.receive_payload(payload))
 

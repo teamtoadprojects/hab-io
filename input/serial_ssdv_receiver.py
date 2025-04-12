@@ -1,5 +1,6 @@
 import asyncio
 from dataclasses import dataclass
+from datetime import datetime, UTC
 import zlib
 
 import serial
@@ -151,6 +152,7 @@ class ssdv_serial_receiver(PluginBase):
                         "width": header.width,
                         "height": header.height,
                     },
+                    recieved_at=datetime.now(UTC)
                 )
             except Exception as e:
                 self.logger.error("Failed to parse SSDV payload", error=str(e))
