@@ -147,6 +147,9 @@ class ssdv_serial_receiver(PluginBase):
                     other_fields={
                         "ssdv": line.removeprefix(b"$$").decode(),
                         "ssdv_header": header,
+                        "packet_id": header.packet_id,
+                        "width": header.width,
+                        "height": header.height,
                     },
                 )
             except Exception as e:

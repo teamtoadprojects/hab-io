@@ -4,13 +4,17 @@ import serial
 import serial_asyncio
 import time
 
-from core import PluginBase
+from core import PluginBase, PayloadType
 
 
 class pico_display_output(PluginBase):
 
     sending = False
     queue = asyncio.Queue()
+
+    def __init__(self, config, core, loop):
+        super().__init__(config, core, loop)
+        self.payload_types = [PayloadType.TELEMETRY, PayloadType.SSDV]
 
     async def start(self):
         await super().start()
@@ -41,17 +45,30 @@ class pico_display_output(PluginBase):
                         time.sleep(0.1)
                         continue
                     self.logger.info("Sending data to Pico Display")
-                    update_data = {
-                        "packet_type": payload.type.value,
-                        "callsign": payload.callsign,
-                        "packet_number": payload.payload_id,
-                        "latitude": payload.latitude,
-                        "longitude": payload.longitude,
-                        "altitude": payload.altitude,
-                        "speed": payload.speed,
-                        "time": payload.recieved_at.strftime("%H:%M:%S"),
-                        "frequency": "433Mhz",
-                    }
+
+                    if payload.type == PayloadType.SSDV:
+                        update_data = {
+                            "packet_type": payload.type.value,
+                            "callsign": payload.callsign,
+                            "image_id": payload.payload_id,
+                            "packet_id": payload.other_fields["packet_id"],
+                            "width": payload.other_fields["width"],
+                            "height": payload.other_fields["height"],
+                            "time": payload.recieved_at.strftime("%H:%M:%S"),
+                            "frequency": payload.frequency,
+                        }
+                    elif payload.type == PayloadType.TELEMETRY:
+                        update_data = {
+                            "packet_type": payload.type.value,
+                            "callsign": payload.callsign,
+                            "packet_number": payload.payload_id,
+                            "latitude": payload.latitude,
+                            "longitude": payload.longitude,
+                            "altitude": payload.altitude,
+                            "speed": payload.speed,
+                            "time": payload.recieved_at.strftime("%H:%M:%S"),
+                            "frequency": payload.frequency,
+                        }
 
                     output_data = json.dumps(update_data).encode() + b"\n"
                     serial_port.write(output_data)
@@ -67,7 +84,7 @@ class pico_display_output(PluginBase):
                     self.sending = False
         except Exception as e:
             self.logger.error("Failed to send data to Pico Display", error=str(e))
-            self.sending = False        
+            self.sending = False
 
     async def output(self, payload):
         self.logger.info("Outputting payload", payload=payload)
