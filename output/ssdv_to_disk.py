@@ -27,7 +27,7 @@ class ssdv_to_disk(PluginBase):
                 "/usr/local/bin/ssdv",
                 "-d",
                 f"{directory / filename}",
-                f                   "{directory / root_name}.jpg",
+                f"{directory / root_name}.jpg",
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
