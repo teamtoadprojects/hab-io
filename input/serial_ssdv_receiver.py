@@ -140,19 +140,24 @@ class ssdv_serial_receiver(PluginBase):
                 "Received line from serial port", line=line, length=len(line)
             )
             try:
-                header = decode_data(bytes.fromhex(line.removeprefix(b"$$").decode()))
+
+                frequency = line.split(b",")[0].removeprefix(b"$$")
+                ssdv_payload = line.split(b",")[1]
+
+                header = decode_data(bytes.fromhex(ssdv_payload.decode()))
                 payload = Payload(
                     type=PayloadType.SSDV,
                     callsign=header.callsign,
                     payload_id=header.image_id,
                     other_fields={
-                        "ssdv": line.removeprefix(b"$$").decode(),
+                        "ssdv": ssdv_payload.decode(),
                         "ssdv_header": header,
                         "packet_id": header.packet_id,
                         "width": header.width,
                         "height": header.height,
                     },
-                    recieved_at=datetime.now(UTC)
+                    recieved_at=datetime.now(UTC),
+                    frequency=frequency.decode(),
                 )
             except Exception as e:
                 self.logger.error("Failed to parse SSDV payload", error=str(e))
